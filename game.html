@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>Game Title</title>
+    <style>
+        body{
+            margin:0px;
+        }
+        
+        .background{
+            display:none;
+        }
+    </style>
+  </head>
+  <body>
+    <img src="background.jpg" id="back1" class="background">
+    <img src="background.jpg" id="back2" class="background">
+    <img src="heart.png" id="heart" class="background">
+    <img src="blood1.png" id="blood1" class="background">
+    <img src="blood2.png" id="blood2" class="background">
+    <img src="pillspaceship2.png" id="ship" class="background">
+    <canvas></canvas>
+    
+
+    <script>      
+      let colors = ["red","green","blue","black","orange","purple"];
+      let radii = [5,10,25,50];
+      
+      let c = document.querySelector("canvas");
+       c.width=window.innerWidth;
+       c.height=window.innerHeight;
+      let ctx = c.getContext("2d");
+
+      let back1 = document.getElementById("back1");
+      let back2 = document.getElementById("back2");
+      let heart1 = document.getElementById("heart");
+      let heart2 = document.getElementById("heart");
+        
+      let blood1 = document.getElementById("blood1");
+      let blood2 = document.getElementById("blood2");
+      
+      let ship = {img: document.getElementById("ship"),
+                 x: 0,
+                 y: 0,
+                 health: 2
+                 };
+        
+      class Blood{
+          constructor(img,xpos,ypos) {
+              this.image=img;
+              this.xcoord=xpos;
+              this.ycoord=ypos;
+          }
+      }
+      
+      let bloods = []
+      let xdisplacement=window.innerWidth;
+      let ydisplacement=window.innerHeight/2 + Math.floor(Math.random()*600)-300;
+      for(let i=0; i<15; i++){
+          if(i%2==0){
+              bloods[i]=new Blood(blood1, xdisplacement, ydisplacement)
+          }
+          else{
+              bloods[i]=new Blood(blood2, xdisplacement, ydisplacement)
+          }
+          xdisplacement+=100;
+          ydisplacement=window.innerHeight/2 + Math.floor(Math.random()*1000)-500;
+      }
+        
+        
+      let back1x = 0;
+      let back2x = -window.innerWidth;
+      let heart1x = window.innerWidth;
+      let heart1y = window.innerHeight;
+      heart1y = heart1y / 2 + Math.floor(Math.random()*500)-250;
+      let heart2x = window.innerWidth * 1.5;
+      let heart2y = window.innerHeight;
+      heart2y = heart2y / 2 + Math.floor(Math.random()*500)-250;
+      
+
+      const drawBackground = () => {
+          ctx.clearRect(0,0,window.innerWidth,window.innerHeight);
+          ctx.drawImage(back1,back1x,0,window.innerWidth,window.innerHeight);
+          ctx.drawImage(back2,back2x,0,window.innerWidth,window.innerHeight);
+          if(back1x==screen.width)
+              back1x=-screen.width;
+          back1x+=1;
+          if(back2x==screen.width)
+              back2x=-screen.width;
+          back2x+=1; 
+          for(let i=0;i<15;i++)
+          {
+              ctx.drawImage(bloods[i].image,bloods[i].xcoord,bloods[i].ycoord,50,50)
+              if(bloods[i].xcoord<-50)
+              {
+                  bloods[i].xcoord=window.innerWidth+30;
+                  bloods[i].ycoord=window.innerHeight/2+Math.floor(Math.random()*1000)-500;
+              }
+              bloods[i].xcoord-=5;
+          }
+          ctx.drawImage(heart1,heart1x,heart1y,400,600);
+          ctx.drawImage(heart2,heart2x,heart2y,400,600);
+          if(heart1x==-200)
+          {
+              heart1x=window.innerWidth;
+              heart1y=window.innerHeight;
+              heart1y=heart1y/2 + Math.floor(Math.random()*500)-250
+          }
+          heart1x-=4;
+          if(heart2x==-200)
+          {
+              heart2x=window.innerWidth;
+              heart2y=window.innerHeight;
+              heart2y=heart2y/2 + Math.floor(Math.random()*500)-250
+          }
+          heart2x-=4;
+          
+          
+          
+          window.requestAnimationFrame(drawBackground);
+      }
+    
+      const drawShip = () => {
+          if(moveDown==true){
+              ship.y+=8;
+          }
+          if(moveUp==true){
+              ship.y-=8;
+          }
+          if(moveRight==true){
+              ship.x+=8;
+          }
+          if(moveLeft==true){
+              ship.x-=3;
+          }
+          ctx.drawImage(ship.img,ship.x,ship.y,450,200);
+          window.requestAnimationFrame(drawShip);
+      }
+      
+      let moveDown = false;
+      let moveUp = false;
+      let moveRight = false;
+      let moveLeft = false;
+      
+      
+      drawBackground();
+      drawShip();
+      
+      document.addEventListener("keyup", event =>{
+         if((event.key == "ArrowDown") || (event.isComposing)){
+             moveDown = false;
+         } 
+         if((event.key == "ArrowUp") || (event.isComposing)){
+             moveUp = false;
+         }
+         if((event.key == "ArrowRight") || (event.isComposing)){
+             moveRight = false;
+         }
+         if((event.key == "ArrowLeft") || (event.isComposing)){
+             moveLeft = false;
+         }
+         if((event.keyCode == 32) || (event.isComposing)){
+             moveDown = false;
+         }
+      });
+        
+      document.addEventListener("keydown", event =>{
+         if((event.key == "ArrowDown") || (event.isComposing)){
+             moveDown = true;
+         } 
+         if((event.key == "ArrowUp") || (event.isComposing)){
+             moveUp = true;
+         }
+         if((event.key == "ArrowRight") || (event.isComposing)){
+             moveRight = true;
+         }
+         if((event.key == "ArrowLeft") || (event.isComposing)){
+             moveLeft = true;
+         }
+         if((event.keyCode == 32) || (event.isComposing)){
+             moveDown = true;
+         }
+      });
+      </script>
+
+  </body>
+</html>
