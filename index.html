@@ -36,11 +36,12 @@
       let moveUp = false;
       let moveRight = false;
       let moveLeft = false;
+      let spacePress = false;
         
       let speed=2;
       let score=0;
       let difficulty=1;
-      let lives=3;
+      let lives=-1;
 
       let back1 = document.getElementById("back1");
       let back2 = document.getElementById("back2");
@@ -123,7 +124,24 @@
       let heart2y = window.innerHeight;
       heart2y = heart2y / 2 + Math.floor(Math.random()*500)-250;
       
-
+      const drawMenu = () => {
+          ctx.clearRect(0,0,window.innerWidth,window.innerHeight);
+          ctx.drawImage(back1,0,0,window.innerWidth,window.innerHeight);
+          if(spacePress==true)
+          {
+              lives=3
+              gameRun();
+          }
+          if(lives==-1)
+          {
+              window.requestAnimationFrame(drawMenu);
+          }
+      }
+        
+      const drawGameOver = () => {
+          
+      }
+        
       const drawBackground = () => {
           ctx.clearRect(0,0,window.innerWidth,window.innerHeight);
           ctx.drawImage(back1,back1x,0,window.innerWidth,window.innerHeight);
@@ -161,9 +179,10 @@
           }
           heart2x-=4;
           
-          
-          
-          window.requestAnimationFrame(drawBackground);
+          if(lives>0)
+          {
+              window.requestAnimationFrame(drawBackground);
+          }
       }
     
       const drawShip = () => {
@@ -180,7 +199,11 @@
               ship.x-=3;
           }
           ctx.drawImage(ship.img,ship.x,ship.y,450,200);
-          window.requestAnimationFrame(drawShip);
+          
+          if(lives>0)
+          {
+              window.requestAnimationFrame(drawShip);
+          }
       }
       
       const drawBird = () => {
@@ -195,7 +218,10 @@
               }
           }
           
-          window.requestAnimationFrame(drawBird);
+          if(lives>0)
+          {
+              window.requestAnimationFrame(drawBird);
+          }
       } 
       
       const drawWBC = () => {
@@ -209,7 +235,11 @@
                   whiteCells[i].ycoord=window.innerHeight/2 + Math.floor(Math.random()*1000)-500;
               }
           }
-          window.requestAnimationFrame(drawWBC);
+          
+          if(lives>0)
+          {
+              window.requestAnimationFrame(drawWBC);
+          }
       }
       
       let scoreStr;
@@ -224,14 +254,21 @@
           diffStr="Difficulty: " + difficulty;
           ctx.fillText(diffStr, window.innerWidth-200,100);
           
-          window.requestAnimationFrame(drawScoreboard);
+          if(lives>0)
+          {
+              window.requestAnimationFrame(drawScoreboard);
+          }
       }
       
-      drawBackground();
-      drawShip();
-      drawBird();
-      drawWBC();
-      drawScoreboard();
+      drawMenu();
+      
+      const gameRun = () => {
+          drawBackground();
+          drawShip();
+          drawBird();
+          drawWBC();
+          drawScoreboard();
+      }
       
       document.addEventListener("keyup", event =>{
          if((event.key == "ArrowDown") || (event.isComposing)){
@@ -247,7 +284,7 @@
              moveLeft = false;
          }
          if((event.keyCode == 32) || (event.isComposing)){
-             moveDown = false;
+             spacePress = false;
          }
       });
         
@@ -265,7 +302,7 @@
              moveLeft = true;
          }
          if((event.keyCode == 32) || (event.isComposing)){
-             moveDown = true;
+             spacePress = true;
          }
       });
       </script>
