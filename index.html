@@ -17,21 +17,30 @@
   <body>
     <img src="background.jpg" id="back1" class="background">
     <img src="background.jpg" id="back2" class="background">
-    <img src="heart.png" id="heart" class="background">
-    <img src="blood1.png" id="blood1" class="background">
-    <img src="blood2.png" id="blood2" class="background">
+    <img src="heart2.png" id="heart" class="background">
+    <img src="bloodcells.png" id="blood1" class="background">
+    <img src="bloodcells2.png" id="blood2" class="background">
     <img src="pillspaceship2.png" id="ship" class="background">
+    <img src="finch.png" id="bird1" class="background">
+    <img src="whitebloodcell.png" id="wbc" class="background">
     <canvas></canvas>
     
 
-    <script>      
-      let colors = ["red","green","blue","black","orange","purple"];
-      let radii = [5,10,25,50];
-      
+    <script>  
       let c = document.querySelector("canvas");
        c.width=window.innerWidth;
        c.height=window.innerHeight;
       let ctx = c.getContext("2d");
+        
+      let moveDown = false;
+      let moveUp = false;
+      let moveRight = false;
+      let moveLeft = false;
+        
+      let speed=2;
+      let score=0;
+      let difficulty=1;
+      let lives=3;
 
       let back1 = document.getElementById("back1");
       let back2 = document.getElementById("back2");
@@ -54,7 +63,23 @@
               this.ycoord=ypos;
           }
       }
+        
+      class Bird{
+          constructor(img,xpos,ypos){
+              this.image=img;
+              this.xcoord=xpos;
+              this.ycoord=ypos;
+          }
+      }
       
+      class whiteBlood{
+          constructor(img,xpos,ypos){
+              this.image=img;
+              this.xcoord=xpos;
+              this.ycoord=ypos;
+          }
+      }
+        
       let bloods = []
       let xdisplacement=window.innerWidth;
       let ydisplacement=window.innerHeight/2 + Math.floor(Math.random()*600)-300;
@@ -69,6 +94,25 @@
           ydisplacement=window.innerHeight/2 + Math.floor(Math.random()*1000)-500;
       }
         
+      let birds = []
+      xdisplacement=window.innerWidth + Math.floor(Math.random()*500);
+      ydisplacement=window.innerHeight/2 + Math.floor(Math.random()*600)-300;
+      for(let i=0;i<10;i++)
+      {
+          birds[i]=new Bird(bird1,xdisplacement,ydisplacement)
+          xdisplacement=window.innerWidth + Math.floor(Math.random()*2000);
+          ydisplacement=window.innerHeight/2 + Math.floor(Math.random()*1000)-500;
+      }
+        
+      let whiteCells = []
+      xdisplacement=window.innerWidth + Math.floor(Math.random()*500);
+      ydisplacement=window.innerHeight/2 + Math.floor(Math.random()*600)-300;
+      for(let i=0;i<15;i++)
+      {
+          whiteCells[i]=new whiteBlood(wbc,xdisplacement,ydisplacement)
+          xdisplacement=window.innerWidth + Math.floor(Math.random()*2000);
+          ydisplacement=window.innerHeight/2 + Math.floor(Math.random()*1000)-500;
+      }
         
       let back1x = 0;
       let back2x = -window.innerWidth;
@@ -102,14 +146,14 @@
           }
           ctx.drawImage(heart1,heart1x,heart1y,400,600);
           ctx.drawImage(heart2,heart2x,heart2y,400,600);
-          if(heart1x==-200)
+          if(heart1x<-400)
           {
               heart1x=window.innerWidth;
               heart1y=window.innerHeight;
               heart1y=heart1y/2 + Math.floor(Math.random()*500)-250
           }
           heart1x-=4;
-          if(heart2x==-200)
+          if(heart2x<-400)
           {
               heart2x=window.innerWidth;
               heart2y=window.innerHeight;
@@ -139,14 +183,55 @@
           window.requestAnimationFrame(drawShip);
       }
       
-      let moveDown = false;
-      let moveUp = false;
-      let moveRight = false;
-      let moveLeft = false;
+      const drawBird = () => {
+          for(let i=0;i<birds.length;i++)
+          {
+              ctx.drawImage(birds[i].image,birds[i].xcoord,birds[i].ycoord,150,100);
+              birds[i].xcoord-=speed;
+              if(birds[i].xcoord<-150)
+              {
+                  birds[i].xcoord=window.innerWidth + Math.floor(Math.random()*2000);
+                  birds[i].ycoord=window.innerHeight/2 + Math.floor(Math.random()*1000)-500;
+              }
+          }
+          
+          window.requestAnimationFrame(drawBird);
+      } 
       
+      const drawWBC = () => {
+          for(let i=0;i<whiteCells.length;i++)
+          {
+              ctx.drawImage(whiteCells[i].image,whiteCells[i].xcoord,whiteCells[i].ycoord,50,50);
+              whiteCells[i].xcoord-=speed;
+              if(whiteCells[i].xcoord<-50)
+              {
+                  whiteCells[i].xcoord=window.innerWidth + Math.floor(Math.random()*2000);
+                  whiteCells[i].ycoord=window.innerHeight/2 + Math.floor(Math.random()*1000)-500;
+              }
+          }
+          window.requestAnimationFrame(drawWBC);
+      }
+      
+      let scoreStr;
+      let diffStr;
+      let livesStr;
+      const drawScoreboard = () => {
+          ctx.font = "30px Arial";
+          scoreStr="Score: " + score;
+          ctx.fillText(scoreStr, window.innerWidth-200, 50);
+          livesStr="Lives: " + lives;
+          ctx.fillText(livesStr, window.innerWidth-200,75);
+          diffStr="Difficulty: " + difficulty;
+          ctx.fillText(diffStr, window.innerWidth-200,100);
+          
+          window.requestAnimationFrame(drawScoreboard);
+      }
       
       drawBackground();
       drawShip();
+      drawBird();
+      drawWBC();
+      drawScoreboard();
       
       document.addEventListener("keyup", event =>{
          if((event.key == "ArrowDown") || (event.isComposing)){
