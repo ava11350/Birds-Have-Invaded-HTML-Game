@@ -53,8 +53,7 @@
       
       let ship = {img: document.getElementById("ship"),
                  x: 0,
-                 y: 0,
-                 health: 2
+                 y: window.innerHeight/2,
                  };
         
       class Blood{
@@ -127,6 +126,14 @@
       const drawMenu = () => {
           ctx.clearRect(0,0,window.innerWidth,window.innerHeight);
           ctx.drawImage(back1,0,0,window.innerWidth,window.innerHeight);
+          ctx.textAlign="center";
+          ctx.font="80px Arial";
+          ctx.fillText("BIRDS HAVE INVADED",window.innerWidth/2,window.innerHeight/3);
+          ctx.font="40px Arial";
+          ctx.fillText("Press Space to Start",window.innerWidth/2,window.innerHeight/3*2);
+          ctx.fillText("Use Arrow Keys to Move",window.innerWidth/2,window.innerHeight/3*2+50);
+          ctx.fillText("Avoid the Birds",window.innerWidth/2,window.innerHeight/3*2+100);
+          ctx.fillText("Collect White Blood Cells",window.innerWidth/2,window.innerHeight/3*2+150);
           if(spacePress==true)
           {
               lives=3
@@ -139,7 +146,28 @@
       }
         
       const drawGameOver = () => {
+          ctx.clearRect(0,0,window.innerWidth,window.innerHeight);
+          ctx.drawImage(back1,0,0,window.innerWidth,window.innerHeight);
+          ctx.textAlign="center";
+          ctx.font="80px Arial";
+          ctx.fillText("GAME OVER",window.innerWidth/2,window.innerHeight/3);
+          ctx.font="40px Arial";
+          ctx.fillText("Score: " + score,window.innerWidth/2,window.innerHeight/3*2);
+          ctx.fillText("Press Space to Play Again :)",window.innerWidth/2,window.innerHeight/3*2+75);
           
+          if(spacePress==true)
+          {
+              lives=3;
+              score=0;
+              difficulty=1;
+              ship.x=0;
+              ship.y=window.innerHeight/2;
+              gameRun();
+          }
+          if(lives<=0)
+          {
+              window.requestAnimationFrame(drawGameOver);
+          }
       }
         
       const drawBackground = () => {
@@ -242,21 +270,70 @@
           }
       }
       
+      const collision = () => {
+            let leftShip = ship.x;
+            let rightShip = ship.x+450;
+            let topShip = ship.y;
+            let bottomShip = ship.y+200;
+          
+            for(let i=0;i<birds.length;i++)
+            {
+                if((birds[i].xcoord>leftShip && birds[i].xcoord<rightShip) || (birds[i].xcoord+150>leftShip && birds[i].xcoord+150<rightShip))
+                {
+                    if((birds[i].ycoord>topShip && birds[i].ycoord<bottomShip) || (birds[i].ycoord+100>topShip && birds[i].ycoord+100<bottomShip))
+                    {
+                        lives-=1;
+                        birds[i].xcoord=window.innerWidth + Math.floor(Math.random()*2000);
+                        birds[i].ycoord=window.innerHeight/2 + Math.floor(Math.random()*1000)-500;
+                    }
+                }
+            }
+          
+            for(let i=0;i<whiteCells.length;i++)
+            {
+                if((whiteCells[i].xcoord>leftShip && whiteCells[i].xcoord<rightShip) || (whiteCells[i].xcoord+50>leftShip && whiteCells[i].xcoord+50<rightShip))
+                {
+                    if((whiteCells[i].ycoord>topShip && whiteCells[i].ycoord<bottomShip) || (whiteCells[i].ycoord+50>topShip && whiteCells[i].ycoord+50<bottomShip))
+                    {
+                        score+=50;
+                        whiteCells[i].xcoord=window.innerWidth + Math.floor(Math.random()*2000);
+                        whiteCells[i].ycoord=window.innerHeight/2 + Math.floor(Math.random()*1000)-500;
+                    }
+                }
+            }
+            
+            if(lives>0)
+            {
+                window.requestAnimationFrame(collision);
+            }
+      }
+      
       let scoreStr;
       let diffStr;
       let livesStr;
       const drawScoreboard = () => {
           ctx.font = "30px Arial";
+          ctx.textAlign="start";
           scoreStr="Score: " + score;
           ctx.fillText(scoreStr, window.innerWidth-200, 50);
           livesStr="Lives: " + lives;
-          ctx.fillText(livesStr, window.innerWidth-200,75);
+          ctx.fillText(livesStr, window.innerWidth-200,85);
           diffStr="Difficulty: " + difficulty;
-          ctx.fillText(diffStr, window.innerWidth-200,100);
+          ctx.fillText(diffStr, window.innerWidth-200,120);
+          
+          if(score>1000*difficulty)
+          {
+              difficulty+=1;
+              speed+=1;
+          }
           
           if(lives>0)
           {
               window.requestAnimationFrame(drawScoreboard);
+          }
+          else
+          {
+              drawGameOver();
           }
       }
       
@@ -268,6 +345,7 @@
           drawBird();
           drawWBC();
           drawScoreboard();
+          collision();
       }
       
       document.addEventListener("keyup", event =>{
