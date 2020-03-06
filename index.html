@@ -23,6 +23,10 @@
     <img src="pillspaceship2.png" id="ship" class="background">
     <img src="finch.png" id="bird1" class="background">
     <img src="whitebloodcell.png" id="wbc" class="background">
+    <audio id="backMusic" loop><source src="ozzy loop.mp3" type="audio/mpeg"></audio>
+    <audio id="harm"><source src="hawk.mp3" type="audio/mpeg"></audio>
+    <audio id="benefit"><source src="benefit.mp3" type="audio/mpeg"></audio>
+    <audio id="gameOver"><source src="gameover.mp3" type="audio/mpeg"></audio>
     <canvas></canvas>
     
 
@@ -50,6 +54,11 @@
         
       let blood1 = document.getElementById("blood1");
       let blood2 = document.getElementById("blood2");
+        
+      let backMusic = document.getElementById("backMusic");
+      let harm = document.getElementById("harm");
+      let benefit = document.getElementById("benefit");
+      let gameOver = document.getElementById("gameOver");
       
       let ship = {img: document.getElementById("ship"),
                  x: 0,
@@ -144,8 +153,16 @@
               window.requestAnimationFrame(drawMenu);
           }
       }
-        
+      
+      let gameOverPlay=false;
+      
       const drawGameOver = () => {
+          backMusic.pause();
+          if(gameOverPlay==false)
+          {
+              gameOver.play();
+              gameOverPlay=true;
+          }
           ctx.clearRect(0,0,window.innerWidth,window.innerHeight);
           ctx.drawImage(back1,0,0,window.innerWidth,window.innerHeight);
           ctx.textAlign="center";
@@ -171,6 +188,7 @@
       }
         
       const drawBackground = () => {
+          backMusic.play();
           ctx.clearRect(0,0,window.innerWidth,window.innerHeight);
           ctx.drawImage(back1,back1x,0,window.innerWidth,window.innerHeight);
           ctx.drawImage(back2,back2x,0,window.innerWidth,window.innerHeight);
@@ -283,6 +301,7 @@
                     if((birds[i].ycoord>topShip && birds[i].ycoord<bottomShip) || (birds[i].ycoord+100>topShip && birds[i].ycoord+100<bottomShip))
                     {
                         lives-=1;
+                        harm.play();
                         birds[i].xcoord=window.innerWidth + Math.floor(Math.random()*2000);
                         birds[i].ycoord=window.innerHeight/2 + Math.floor(Math.random()*1000)-500;
                     }
@@ -296,6 +315,7 @@
                     if((whiteCells[i].ycoord>topShip && whiteCells[i].ycoord<bottomShip) || (whiteCells[i].ycoord+50>topShip && whiteCells[i].ycoord+50<bottomShip))
                     {
                         score+=50;
+                        benefit.play();
                         whiteCells[i].xcoord=window.innerWidth + Math.floor(Math.random()*2000);
                         whiteCells[i].ycoord=window.innerHeight/2 + Math.floor(Math.random()*1000)-500;
                     }
@@ -346,6 +366,7 @@
           drawWBC();
           drawScoreboard();
           collision();
+          gameOverPlay=false;
       }
       
       document.addEventListener("keyup", event =>{
